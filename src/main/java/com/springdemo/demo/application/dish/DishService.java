@@ -1,61 +1,57 @@
 package com.springdemo.demo.application.dish;
 
 import com.springdemo.demo.domain.dish.aggregate.Dish;
-import com.springdemo.demo.domain.dish.ports.inbound.*;
 import com.springdemo.demo.domain.dish.ports.outbound.DishRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @Transactional
-public class DishService implements DishInbound {
+public class DishService {
 
     private final DishRepository dishRepository;
-
 
     public DishService(DishRepository dishRepository) {
         this.dishRepository = dishRepository;
     }
 
-    @Override
-    public DishCreated create(String name) {
-        Dish dish = Dish.create(name);
-        Dish saved = dishRepository.save(dish);
-        return new DishCreated(saved);
+    public Dish createDish(String name, boolean active) {
+        Dish dish = Dish.create(name, active);
+        return dishRepository.save(dish);
     }
 
-    @Override
-    public DishActivated activate(UUID dishId) {
-        return dishRepository.findById(dishId)
-                .map(dish -> {
-                    Dish activated = dish.activate();
-                    dishRepository.save(activated);
-                    return new DishActivated(true);
-                })
-                .orElse(new DishActivated(false));
+    @Transactional(readOnly = true)
+    public Optional<Dish> getDishById(UUID id) {
+        return dishRepository.findById(id);
     }
 
-    @Override
-    public DishDeactivated deactivate(UUID dishId) {
-        return dishRepository.findById(dishId)
-                .map(dish -> {
-                    Dish deactivated = dish.deactivate();
-                    dishRepository.save(deactivated);
-                    return new DishDeactivated(true);
-                })
-                .orElse(new DishDeactivated(false));
+    @Transactional(readOnly = true)
+    public Dish[] getDishes() {
+        return dishRepository.findAllByActiveTrue();
     }
 
-    @Override
-    public DishUpdated update(UUID dishId, String newName) {
-        return dishRepository.findById(dishId)
-                .map(dish -> {
-                    Dish updated = dish.updateName(newName);
-                    Dish saved = dishRepository.save(updated);
-                    return new DishUpdated(saved);
-                })
-                .orElse(new DishUpdated(null));
+    public Dish updateDish(UUID id, String name, Boolean active) {
+        Dish dish = dishRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Dish not found: " + id));
+
+        if (name != null) {
+            dish.updateName(name);
+        }
+        if (active != null) {
+            dish.setActive(active);
+        }
+
+        return dishRepository.save(dish);
     }
+
+    public void deleteDish(UUID id) {
+        dishRepository.deleteById(id);
+    }
+
+
 }

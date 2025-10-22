@@ -1,4 +1,4 @@
-package com.springdemo.demo.adapters.outbound.persistance;
+package com.springdemo.demo.adapters.outbound.persistence;
 
 import com.springdemo.demo.domain.dish.aggregate.Dish;
 import org.springframework.stereotype.Component;

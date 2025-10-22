@@ -1,61 +1,76 @@
 package com.springdemo.demo.adapters.inbound.rest;
 
-import com.springdemo.demo.adapters.outbound.persistance.DishEntity;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.springdemo.demo.adapters.inbound.rest.dto.DishRequest;
+import com.springdemo.demo.adapters.inbound.rest.dto.DishResponse;
+import com.springdemo.demo.application.dish.DishService;
+import com.springdemo.demo.domain.dish.aggregate.Dish;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/dishes")
 public class DishController {
 
-    private final JpaDishRepository dishRepository;
+    private final DishService dishService;
 
-    @Autowired
-    public DishController(JpaDishRepository dishRepository) {
-        this.dishRepository = dishRepository;
+    public DishController(DishService dishService) {
+        this.dishService = dishService;
     }
 
     @GetMapping
-    public ResponseEntity<List<DishEntity>> getAllDishes() {
-        List<DishEntity> dishes = dishRepository.findAll();
-        return ResponseEntity.ok(dishes);
+    public ResponseEntity<DishResponse[]> findAllByActiveTrue() {
+        Dish[] dishes = dishService.getDishes();
+        DishResponse[] responses = Arrays.stream(dishes).map(this::toResponse)
+                .toArray(DishResponse[]::new);
+        return ResponseEntity.ok(responses);
+    }
+
+
+    @PostMapping
+    public ResponseEntity<DishResponse> createDish(@Valid @RequestBody DishRequest request) {
+        Dish dish = dishService.createDish(request.name(), request.active());
+        return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(dish));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DishEntity> getDishById(@PathVariable UUID id) {
-        return dishRepository.findById(id)
-                .map(ResponseEntity::ok)
+    public ResponseEntity<DishResponse> getDishById(@PathVariable UUID id) {
+        return dishService.getDishById(id)
+                .map(dish -> ResponseEntity.ok(toResponse(dish)))
                 .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping
-    public ResponseEntity<DishEntity> createDish(@RequestBody DishEntity dish) {
-        DishEntity savedDish = dishRepository.save(dish);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedDish);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DishEntity> updateDish(@PathVariable UUID id, @RequestBody DishEntity dishDetails) {
-        return dishRepository.findById(id)
-                .map(dish -> {
-                    // Update fields as needed
-                    DishEntity updatedDish = dishRepository.save(dishDetails);
-                    return ResponseEntity.ok(updatedDish);
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<DishResponse> updateDish(
+            @PathVariable UUID id,
+            @Valid @RequestBody DishRequest request) {
+        try {
+            Dish dish = dishService.updateDish(id, request.name(), request.active());
+            return ResponseEntity.ok(toResponse(dish));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDish(@PathVariable UUID id) {
-        if (dishRepository.existsById(id)) {
-            dishRepository.deleteById(id);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        dishService.deleteDish(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    private DishResponse toResponse(Dish dish) {
+        return new DishResponse(
+                dish.getId(),
+                dish.getName(),
+                dish.isActive(),
+                dish.getCreatedAt(),
+                dish.getUpdatedAt()
+        );
     }
 }

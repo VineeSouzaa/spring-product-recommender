@@ -1,11 +1,10 @@
-package com.springdemo.demo.adapters.inbound.rest;
+package com.springdemo.demo.adapters.outbound.persistence;
 
-import com.springdemo.demo.adapters.outbound.persistance.DishEntity;
-import com.springdemo.demo.adapters.outbound.persistance.DishMapper;
 import com.springdemo.demo.domain.dish.aggregate.Dish;
 import com.springdemo.demo.domain.dish.ports.outbound.DishRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,6 +24,12 @@ public class DishRepositoryAdapter implements DishRepository {
         DishEntity entity = mapper.toEntity(dish);
         DishEntity saved = jpaRepository.save(entity);
         return mapper.toDomain(saved);
+    }
+
+    @Override
+    public Dish[] findAllByActiveTrue() {
+        DishEntity[] dishes = jpaRepository.findAllByActiveTrue().toArray(new DishEntity[0]);
+        return Arrays.stream(dishes).map(mapper::toDomain).toArray(Dish[]::new);
     }
 
     @Override

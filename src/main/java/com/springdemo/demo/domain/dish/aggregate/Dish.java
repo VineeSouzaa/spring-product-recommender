@@ -21,12 +21,12 @@ public class Dish {
         this.updatedAt = updatedAt;
     }
 
-    public static Dish create(String name) {
+    public static Dish create(String name, boolean active) {
         Timestamp now = new Timestamp(System.currentTimeMillis());
         return new Dish(
                 UUID.randomUUID(),
                 name,
-                true,
+                active,
                 now,
                 now
         );
@@ -74,6 +74,20 @@ public class Dish {
                 this.id,
                 newName,
                 this.active,
+                this.createdAt,
+                new Timestamp(System.currentTimeMillis())
+        );
+    }
+
+    public Dish setActive(boolean newActive) {
+        if(this.active == newActive) {
+            return this;
+        }
+
+        return new Dish(
+                this.id,
+                this.name,
+                newActive,
                 this.createdAt,
                 new Timestamp(System.currentTimeMillis())
         );

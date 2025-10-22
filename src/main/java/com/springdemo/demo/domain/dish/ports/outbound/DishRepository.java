@@ -8,4 +8,5 @@ public interface DishRepository {
     Dish save(Dish dish);
     Optional<Dish> findById(UUID id);
     void deleteById(UUID id);
+    Dish[] findAllByActiveTrue();
 }

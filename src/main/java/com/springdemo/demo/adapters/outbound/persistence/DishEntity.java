@@ -1,4 +1,4 @@
-package com.springdemo.demo.adapters.outbound.persistance;
+package com.springdemo.demo.adapters.outbound.persistence;
 
 import jakarta.persistence.*;
 import java.sql.Timestamp;
