@@ -21,9 +21,20 @@ public class DishRepositoryAdapter implements DishRepository {
 
     @Override
     public Dish save(Dish dish) {
-        DishEntity entity = mapper.toEntity(dish);
-        DishEntity saved = jpaRepository.save(entity);
-        return mapper.toDomain(saved);
+        Optional<DishEntity> existingEntity = jpaRepository.findById(dish.getId());
+
+        if (existingEntity.isPresent()) {
+            DishEntity entity = existingEntity.get();
+            entity.setName(dish.getName());
+            entity.setActive(dish.isActive());
+            entity.setUpdatedAt(dish.getUpdatedAt());
+            DishEntity saved = jpaRepository.save(entity);
+            return mapper.toDomain(saved);
+        } else {
+            DishEntity entity = mapper.toEntity(dish);
+            DishEntity saved = jpaRepository.save(entity);
+            return mapper.toDomain(saved);
+        }
     }
 
     @Override

@@ -4,9 +4,6 @@ import com.springdemo.demo.domain.dish.aggregate.Dish;
 import com.springdemo.demo.domain.dish.ports.outbound.DishRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -42,8 +39,13 @@ public class DishService {
         if (name != null) {
             dish.updateName(name);
         }
+
         if (active != null) {
-            dish.setActive(active);
+            if (active) {
+                dish.activate();
+            } else {
+                dish.deactivate();
+            }
         }
 
         return dishRepository.save(dish);

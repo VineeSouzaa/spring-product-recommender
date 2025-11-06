@@ -4,11 +4,11 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 public class Dish {
-    private final UUID id;
-    private final String name;
-    private final boolean active;
+    private String name;
+    private boolean active;
     private final Timestamp createdAt;
-    private final Timestamp updatedAt;
+    private final UUID id;
+    private Timestamp updatedAt;
 
     private Dish(UUID id, String name, boolean active, Timestamp createdAt, Timestamp updatedAt) {
         if (name == null || name.isBlank()) {
@@ -37,60 +37,22 @@ public class Dish {
         return new Dish(id, name, active, createdAt, updatedAt);
     }
 
-    public Dish deactivate() {
-        if (!this.active) {
-            return this;
-        }
-        return new Dish(
-                this.id,
-                this.name,
-                false,
-                this.createdAt,
-                new Timestamp(System.currentTimeMillis())
-        );
+    public void deactivate() {
+        this.active = false;
+        this.updatedAt = new Timestamp(System.currentTimeMillis());
     }
 
-    public Dish activate() {
-        if (this.active) {
-            return this;
-        }
-        return new Dish(
-                this.id,
-                this.name,
-                true,
-                this.createdAt,
-                new Timestamp(System.currentTimeMillis())
-        );
+    public void activate() {
+        this.active = true;
+        this.updatedAt = new Timestamp(System.currentTimeMillis());
     }
 
-    public Dish updateName(String newName) {
+    public void updateName(String newName) {
         if (newName == null || newName.isBlank()) {
             throw new IllegalArgumentException("Dish name cannot be empty");
         }
-        if (this.name.equals(newName)) {
-            return this;
-        }
-        return new Dish(
-                this.id,
-                newName,
-                this.active,
-                this.createdAt,
-                new Timestamp(System.currentTimeMillis())
-        );
-    }
-
-    public Dish setActive(boolean newActive) {
-        if(this.active == newActive) {
-            return this;
-        }
-
-        return new Dish(
-                this.id,
-                this.name,
-                newActive,
-                this.createdAt,
-                new Timestamp(System.currentTimeMillis())
-        );
+        this.name = newName;
+        this.updatedAt = new Timestamp(System.currentTimeMillis());
     }
 
     public UUID getId() {
