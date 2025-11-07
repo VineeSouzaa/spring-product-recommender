@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.library.GeneralCodingRules.*;
 
-@Disabled("Temporarily disabled for refactoring")
 class SolidPrinciplesTest {
 
     private static JavaClasses classes;
@@ -62,3 +61,4 @@ class SolidPrinciplesTest {
                 .check(classes);
     }
 }
+

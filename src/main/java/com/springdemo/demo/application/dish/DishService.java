@@ -2,13 +2,9 @@ package com.springdemo.demo.application.dish;
 
 import com.springdemo.demo.domain.dish.aggregate.Dish;
 import com.springdemo.demo.domain.dish.ports.outbound.DishRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
-@Service
-@Transactional
 public class DishService {
 
     private final DishRepository dishRepository;
@@ -22,12 +18,10 @@ public class DishService {
         return dishRepository.save(dish);
     }
 
-    @Transactional(readOnly = true)
     public Optional<Dish> getDishById(UUID id) {
         return dishRepository.findById(id);
     }
 
-    @Transactional(readOnly = true)
     public Dish[] getDishes() {
         return dishRepository.findAllByActiveTrue();
     }

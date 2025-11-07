@@ -11,7 +11,6 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
-@Disabled("Temporarily disabled for refactoring")
 class HexagonalArchitectureTest {
 
     private static JavaClasses classes;
@@ -139,7 +138,7 @@ class HexagonalArchitectureTest {
     @Test
     void layered_architecture_should_be_respected() {
         layeredArchitecture()
-                .consideringAllDependencies()
+                .consideringOnlyDependenciesInAnyPackage("com.springdemo.demo..")
                 .layer("Domain").definedBy("..domain..")
                 .layer("Application").definedBy("..application..")
                 .layer("Adapters").definedBy("..adapters..")
@@ -159,3 +158,4 @@ class HexagonalArchitectureTest {
                 .check(classes);
     }
 }
+

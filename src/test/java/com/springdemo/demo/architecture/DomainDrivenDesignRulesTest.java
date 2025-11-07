@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
-@Disabled("Temporarily disabled for refactoring")
 class DomainDrivenDesignRulesTest {
 
     private static JavaClasses classes;
@@ -73,3 +72,4 @@ class DomainDrivenDesignRulesTest {
         rule.check(classes);
     }
 }
+
